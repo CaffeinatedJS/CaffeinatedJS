@@ -1,0 +1,304 @@
+
+
+/*HTML
+{
+	overflow: hidden;
+}
+BODY
+{
+	margin: 0;
+	background-color: #333333;
+	text-align: center;
+	overflow: hidden;
+	overflow-y: hidden;
+	font-size: 14px;
+}
+#root
+{
+	margin: 1em auto;
+	
+	height: 334px;
+	width: 603px;
+	text-align: left;
+	position: relative;
+}*/
+.ui_slidetable
+{
+	/*[disabled]background-color:#E5ECFE;*/
+	width: 99%;
+	
+	position: relative;
+	-webkit-box-shadow: 0px 0px 5px #000;
+	box-shadow: 0px 0px 5px #000;
+	-webkit-border-top-left-radius: 0.6em;
+	-webkit-border-top-right-radius: 0.6em;
+}
+.ui_slidetable #titleBar
+{
+	border-bottom: 1px solid #9E9E9E;
+	height: 24px;
+	/*[disabled]border-top:1px solid #020202;*/
+	line-height: 1.6;
+	padding-left: 9px;
+	background: #ADADAD url(../../images/button_highlight_white_40_down.png) 0 -32px repeat-x;
+	-moz-border-radius: 0.6em 0.6em 0 0;
+	border-radius: 0.6em 0.6em 0 0;
+	-webkit-border-top-left-radius: 0.6em;
+	-webkit-border-top-right-radius: 0.6em;
+	color: #000;
+	cursor: default;
+	-moz-user-select: none;
+	user-select: none;
+	-webkit-user-select: none;
+}
+.ui_slidetable #titleBar #title
+{
+	margin: 2px 0px 0px;
+	font-weight: bold;
+	display: compact;
+	float: left;
+}
+.ui_slidetable #titleBar .controlBtn
+{
+	float: right;
+	color: #A0A0A0;
+	border: 1px solid #828282;
+	-moz-border-radius:7px;
+	-webkit-border-radius:7px;
+	border-radius:7px;
+	width: 14px;
+	height: 14px;
+	margin: 4px 6px 0 0;
+	padding: 0 0 0 4px;
+	line-height: 1.4;
+	font-size: 10px;
+	font-weight: bolder;
+	background: #4A6CA0 url(../../images/button_highlight_white_40_down.png) 0 -32px repeat-x;
+}
+.ui_slidetable #titleBar .controlBtn:HOVER
+{
+	color: #FFFFFF;
+	background-color: #4A6CA0;
+}
+.ui_slidetable #sliderBar
+{
+	position: absolute;
+	right: 0;
+	height: 180px;
+	margin-top: 41px;
+	padding: 0 0 5px 0;
+}
+.ui_slidetable #sliderBar #slider
+{
+	background: url("slidertable_slider.png");
+	width: 17px;
+	height: 79px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	margin: 0px -7px 0 0px;
+	position: absolute;
+	left: -7px;
+	opacity: 1;
+	top: 1px;
+}
+.ui_slidetable #sliderBar #cursor
+{
+	background-color: #020202;
+	width: 9px;
+	height: 47px;
+	position: absolute;
+	left: -5px;
+	top: 6px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	margin: 0px -5px 0 0px;
+	opacity: 0.6;
+}
+
+.ui_slidetable #sliderBar #end
+{
+	background: url("slidertable_end.png");
+	width: 18px;
+	height: 12px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	margin: 0px -6px 0 0px;
+	position: absolute;
+	bottom:-12px;
+	left: -8px;
+	opacity: 1;
+}
+.ui_slidetable #head
+{
+	background-color: #DFE1E6;
+	border-bottom: 1px solid #CECECE;
+}
+.ui_slidetable #head TABLE
+{
+	width: 100%;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+	height: 20px;
+	font-size: 13px;
+}
+.ui_slidetable #head TD
+{
+	border-right: 1px solid #8C8C8C;
+	cursor: default;
+	padding-left: 3px;
+	background: url(../../images/table_head_bg.png) 0 0 repeat-x;
+}
+.ui_slidetable #head TD:HOVER
+{
+	background: url(../../images/table_head_hover_bg.png) 0 0 repeat-x;
+}
+.ui_slidetable #content
+{
+	height: 240px;
+	overflow: hidden;
+	background-color: #EEE;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+.ui_slidetable #content TABLE
+{
+	width: 100%;
+	margin-top: 0px;
+	border-bottom: 1px solid #CBCBCB;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+}
+.ui_slidetable #content TABLE tr {height: 21px;}
+.ui_slidetable #content TABLE tr:nth-child(2n)
+{
+	background: #fafad3;
+}
+.ui_slidetable #content TABLE TR:HOVER
+{
+	background: #0B7AFE url(../../images/button_highlight_white_40_down.png) 0 -36px repeat-x;
+	color: #DDDDDD;
+}
+.ui_slidetable #content TABLE td, TABLE TR.addTemplete TD
+{
+	overflow:hidden;
+	max-width: 5px;
+}
+TABLE TR.addTemplete TD
+{
+	padding: 0;
+	margin: 0;
+}
+.ui_slidetable #content TABLE TR.Selected
+{
+	background: #0B7AFE url(../../images/button_highlight_white_40_up.png) 0 9px repeat-x;
+	color: #CCCCCC;
+}
+.ui_slidetable #content TABLE TD
+{
+	border-right: 1px solid #CCCCCC;
+	border-top: 1px solid #CCCCCC;
+	padding-left: 5px;
+	cursor: default;
+	font-size: 13px;
+	line-height: 1.5;
+}
+.ui_slidetable #content TABLE TR.addTemplete TD *
+{
+	width: 100%;
+	border: 0px solid #000000;
+	padding: 0;
+	margin: 0px;
+	height: 100%;
+	line-height: 1.5;
+	height: 1.6em;
+}
+.ui_slidetable #content TABLE TD:HOVER
+{
+	background: #48A7FE url(../../images/button_highlight_white_40_down.png) 0 -36px repeat-x;
+	color: #FFFFFF;
+}
+.ui_slidetable #statBar
+{
+	height: 24px;
+	background: #ADADAD url(../../images/button_highlight_white_40_down.png) 0 -36px repeat-x;
+	color: #000;
+	width: 100%;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	cursor: default;
+}
+.ui_slidetable #statBar #stat
+{
+	display: block;
+	margin: 2px 0 0 7px;
+	font: 13px sans-serif;
+	width: 360px;
+	float: left;
+}
+.ui_slidetable #statBar #statSlider {
+	width: 240px;
+	float:right;
+	margin: 10px 10px 0 0;
+}
+
+
+#editBar TABLE TR TD *
+{
+	width: 98%;
+	font-size: 12px;
+	border: 0;
+	text-align: left;
+	margin: 1px;
+	height: 18px;
+	padding: 0px;
+}
+#editBar TABLE TR
+{
+	padding: 0;
+	height: 1.5em;
+	text-align: center;
+	background: #5311ff url(../../images/button_highlight_white_40_down.png) 0 -36px repeat-x;
+	color: #FFFFFF;
+}
+#editBar TABLE TR TD
+{
+	border-right: 1px solid #8C8C8C;
+}
+#editBar TABLE
+{
+	width: 100%;
+}
+#editBar #editCtrlBar
+{
+	background: #5311ff url(../../images/button_highlight_white_40_up.png) 0 6px repeat-x;
+	color: #CCCCCC;
+	-moz-border-radius: 0 0 3px 3px;
+	-webkit-border-radius: 0 0 3px 3px;
+	border-radius: 0 0 3px 3px;
+	padding: 2px;
+}
+#editBar #editCtrlBar .button
+{
+	line-height: 1.7;
+	cursor: default;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	border: 1px solid #3D4870;
+	margin: 0;
+	/*background-color: #105FBB;*/
+	background: #CCC url(../../images/button_highlight_white_40_down.png) 0 -36px repeat-x;
+	color: #333;
+	text-align: center;
+}
+#editBar #editCtrlBar .button:HOVER
+{
+	background-position-y: -24px;
+	/*color: #FFFFFF;*/
+}
+

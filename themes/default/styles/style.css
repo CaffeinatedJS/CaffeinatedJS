@@ -1,0 +1,70 @@
+body {
+	margin: 0;
+	font-size: 14px;
+}
+#header {
+	/*width: 100%;*/
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: 5em;
+	/*border: 1px solid #EBEBEB;*/
+	padding-top: 1.5em;
+	padding-left: 1em;
+}
+#sider {
+	/*float: left;*/
+	position: absolute;
+	width: 18em;
+	top: 5em;
+	bottom: 0;
+	margin-top: 1px;
+	/*border: 1px solid #EBEBEB;*/
+}
+#main {
+	position: absolute;
+	left: 18em;
+	bottom: 0;
+	top: 5em;
+	right: 0em;
+	/*border: 1px solid #EBEBEB;*/
+	margin-top: 1px;
+	margin-left: 1px;
+	/*margin-right: 1px;*/
+	overflow: scroll;
+}
+
+ui\:table {
+	color: #fe1d1d;
+	background-color: #f2ecec;
+	display: block;
+}
+
+#login {
+	width: 400px;
+	height: 300px;
+	position: absolute;
+	margin-left: -200px;
+	margin-top: -150px;
+	left: 50%;
+	top: 50%;
+}
+#login .ui_tabs { height: 100% }
+#login table {
+	width: 360px;
+	position: absolute;
+	left: 50%;
+	margin-left: -180px;
+	margin-top: 20px;
+}
+#login table tr {
+	height: 3em;
+}
+
+.ui_message {
+	padding: .7em .5em;
+	min-width: 24em;
+}
+.ui_message p {
+	margin: 0;
+}
