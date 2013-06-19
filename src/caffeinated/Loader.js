@@ -27,7 +27,7 @@
 	 *	Object extend Support
 	 *	Copied from jQuery Source Code(v1.7.2)
 	 */
-	cafe.extend = function() {
+	extend = function() {
 		var options, name, src, copy, copyIsArray, clone,
 			target = arguments[0] || {},
 			i = 1,
@@ -109,9 +109,10 @@
 		this.debug = debug
 		this.console = console || window.console
 		this.isChrome = isChrome
+		this.divider = '-'.replace(/(\-)/, "$1$1$1$1$1").replace(/((\-){5})/, "$1$1")
 		this.divider = isChrome
-				? "--------------------------------------------------"
-				: "-----------------------------------------------------------------"
+				? this.divider.replace(/((\-){10})/, "$1$1$1$1$1")
+				: this.divider.replace(/((\-){10})/, "$1$1$1$1$1$1")
 		//this.level = level || 'error'
 	}
 	
@@ -140,14 +141,16 @@
 		, config_path = _this.getAttribute('data-config') || 'cafe-config.js'
 		, debug_in_cafe = _this.getAttribute('data-debug') === 'true' ? true : false
 		, isChrome = /chrome/.test(window.navigator.userAgent.toLowerCase())
-		, logger = cafe.logger = new Logger(debug_in_cafe, window.console, isChrome)
+		, logger	= window.logger
+					= cafe.logger
+					= new Logger(debug_in_cafe, window.console, isChrome)
 
 	/*
 	 *	Caffeinated Context
 	 */
-	Context = function() {
-		this.jobs	= new cafe.JobQueue(this);
-		this.loader = new cafe.Loader();
+	var Context = function() {
+		this.jobs	= new JobQueue(this);
+		this.loader = new Loader();
 		//this.stack = {};//???
 	};
 	
@@ -159,7 +162,7 @@
 				, jobs = this.jobs
 
 			this.loadConfigJobs(jobs, loader)
-			//this.loadDependencesJobs(jobs, loader)
+			this.loadDependencesJobs(jobs, loader)
 
 			this.jobs.start()
 			//this.initRuntime();
@@ -170,31 +173,51 @@
 
 			this.isdebug = debug_in_cafe
 			
-			jobs.add(new cafe.AsyncJob(function(context) {
+			jobs.add(new AsyncJob(function(context) {
 				loader.loadScripts(config_path, this)
 			}, "load config define"))
 
-			jobs.add(new cafe.SerialJob(function(context) {
+			jobs.add(new SerialJob(function(context) {
 				context.options = cafe.extend(context.defaults, cafe.options);
 				context.options.debug = context.isdebug
 			}, "configrate context options"))
 		}
 
 		, loadDependencesJobs: function(jobs, loader) {
-
-			jobs.add(new cafe.AsyncJob(function(context) {
+			/*
+			jobs.add(new AsyncJob(function(context) {
 				var options = context.options
 				loader.loadScripts([options.lib_path + options.core_path])
 				loader.loadScripts(
 					[(options.themes_path + options.theme + "/theme.js")]
 					, this)
 			}, "load basic dependences"))
+			//*/
+			var transc = new cafe.Transaction([
+				
+				new AsyncJob(function(context) {
+					var options = context.options
+					loader.loadScripts([options.lib_path + options.core_path])
+					loader.loadScripts(
+						[(options.themes_path + options.theme + "/theme.js")]
+						, this)
+				}, "load basic dependences")
+
+				/*
+				, new SerialJob(function() {
+
+				})
+				//*/
+
+			], "load theme package and other plug-ins")
+
+			jobs.add(transc)
 
 		}
 
 		, loadThemesAndPluginsJobs: function(jobs, loader) {
 
-			
+
 		}
 		
 		, initRuntime		: function() {
@@ -203,38 +226,38 @@
 			var loader = this.loader
 				, config_path = this.config_path
 
-			this.jobs.add(new cafe.AsyncJob(function(context) {
+			this.jobs.add(new AsyncJob(function(context) {
 				console.log("Loading global config file......");
 				this.info = "加载全局配置文件";
 				loader.loadScripts(config_path, this.callback);
 			}));
 			
 			//Init Global Config
-			this.jobs.add(new cafe.SerialJob(function(context) {
+			this.jobs.add(new SerialJob(function(context) {
 				console.log("Loading context config......");
 				UIContext.options = cafe.extend(cafe.Config.global, cafe.config);
 			}));
 			
-			this.jobs.add(new cafe.AsyncJob(function(context) {
+			this.jobs.add(new AsyncJob(function(context) {
 				console.log("Loading jQuery Library......");
 				loader.loadScripts(UIContext.options.plugins_path + UIContext.options.jquery_path, this.callback);
 			}));
 			
 			//Dependence Load Job(DLJ)
-			var dlj = new cafe.ParallelJob();
+			var dlj = new cafe.Transaction();
 			dlj.init = function() {
 				console.log("Loading basic dependences......");
 				/*
 				for(var n in loader.scripts) {
 					(function(url, jobs, callback, loader) {
-						jobs.push(new cafe.AsyncJob(function(){
+						jobs.push(new AsyncJob(function(){
 							loader.loadScripts([url], callback);
 						}));
 					})(loader.scripts[n], this.jobs, this.callback, UIContext.loader);
 				}
 				//*/
 				
-				this.jobs.push(new cafe.AsyncJob(function() {
+				this.jobs.push(new AsyncJob(function() {
 					var options = UIContext.options;
 					loader.loadScripts([options.lib_path + options.core_path]);
 					loader.loadScripts(
@@ -247,7 +270,7 @@
 			
 			
 			//Theme and Plug－ins Load Job
-			var tnplj = new cafe.ParallelJob();
+			var tnplj = new cafe.Transaction();
 			tnplj.init = function() {
 				
 				console.log("Loading Theme and Plug-ins......");
@@ -256,7 +279,7 @@
 				
 				for(var n in theme.style_sheets) {
 					(function(url, options, jobs, callback, loader) {
-						jobs.push(new cafe.AsyncJob(function() {
+						jobs.push(new AsyncJob(function() {
 							loader.loadCssFiles(
 								options.themes_path + options.theme + "/" + url
 								, callback
@@ -267,7 +290,7 @@
 				
 				for(var n in theme.scripts) {
 					(function(url, options, jobs, callback, loader) {
-						jobs.push(new cafe.AsyncJob(function() {
+						jobs.push(new AsyncJob(function() {
 							loader.loadScripts(
 								options.themes_path + options.theme + "/" + url
 								, callback
@@ -278,7 +301,7 @@
 				
 				for(var n in options.plugins) {
 					(function(url, options, jobs, callback, loader) {
-						jobs.push(new cafe.AsyncJob(function() {
+						jobs.push(new AsyncJob(function() {
 							loader.loadScripts(
 								url.indexOf("http://") == 0 ? url : options.plugins_path + url
 								, callback
@@ -291,7 +314,7 @@
 			this.jobs.add(tnplj);
 			
 			//Init MainView
-			this.jobs.add(new cafe.SerialJob(function() {
+			this.jobs.add(new SerialJob(function() {
 				console.log("Start Render initializing......");
 				var render = new cafe.Render();
 				
@@ -332,7 +355,7 @@
 	/*
 	 *	ICUI Context Job Scheduling
 	 */
-	cafe.JobQueue = function(context) {
+	var JobQueue = function(context) {
 		//console.log("Start jobs queue initializing......");
 		this.queue		= []
 		this.jobs		= {}
@@ -341,7 +364,7 @@
 
 	};
 	
-	cafe.JobQueue.prototype = {
+	JobQueue.prototype = {
 		
 		start	: function() {
 
@@ -362,7 +385,7 @@
 				logger.info(
 					  "%c\u2193 %cProcessing: %c"
 						+ (job.desc || job.id)
-					, "font-weight:bold;color:#0000FF"
+					, "font-weight:bold;color:#007CF3"
 					, "font-weight:bold;color:#333"
 					, "font-weight:normal;color:#333")
 				job.process(context);
@@ -381,24 +404,31 @@
 
 		},
 		
+		/*	
 		hasNext	: function() {
 			return this.queue.length > 0;
 		},
-		
+		//*/
 		next	: function() {
 			return this.jobs[this.queue[0]];
 		},
 		
 		finish	: function(id) {
 
+			var job = this.jobs[id]
+				inTransaction = job.tid ? true : false
+
+			if(inTransaction) transc = this.jobs[job.tid]
+
+
 			//I dont know why!!!
-			if(this.jobs[id] == undefined && /(msie) ([\w.]+)/.test(window.navigator.userAgent.toLowerCase())) return;
+			if(job == undefined && /(msie) ([\w.]+)/.test(window.navigator.userAgent.toLowerCase())) return;
 			
-			if(this.jobs[id].isDone()) {
+			if(job.isDone()) {
 				
 				logger.info(
 					  "%c\u2714 %cComplete\t: %c"
-						+ this.jobs[id].desc
+						+ job.desc
 					, "font-weight:bold;color:#00A600"
 					, "font-weight:bold;color:#333"
 					, "font-weight:normal;color:#333");
@@ -408,16 +438,16 @@
 				//UIContext.start();
 				//this.isEmpty = this.jobs.length > 0
 				
-				var job = this.next()
+				var nextJob = this.next()
 
-				if(job) {
+				if(nextJob) {
 					logger.info(
 						  "%c\u2193 %cProcessing: %c"
-							+ (job.desc || job.id)
-						, "font-weight:bold;color:#0000FF"
+							+ (nextJob.desc || job.id)
+						, "font-weight:bold;color:#007CF3"
 						, "font-weight:bold;color:#333"
 						, "font-weight:normal;color:#333")
-					job.process(this.context)
+					nextJob.process(this.context)
 				} else {
 					this.isWorking = false;
 					
@@ -437,7 +467,7 @@
 		
 	};
 	
-	cafe.SerialJob = function(job, desc) {
+	var SerialJob = function(job, desc) {
 		
 		this.job	= job
 		this.desc	= desc
@@ -446,7 +476,7 @@
 	
 	}
 	
-	cafe.SerialJob.prototype = {
+	SerialJob.prototype = {
 
 		process	: function(context) {
 
@@ -468,7 +498,7 @@
 		}
 	};
 	
-	cafe.AsyncJob = function(job, desc) {
+	var AsyncJob = function(job, desc) {
 		
 		var id	= this.id = cafe.makeUUID()
 
@@ -484,7 +514,7 @@
 
 	};
 	
-	cafe.AsyncJob.prototype = {
+	AsyncJob.prototype = {
 
 		process	: function(context) {
 			
@@ -501,56 +531,65 @@
 		}
 
 		, isDone	: function() {
-			return this.stat == "done";
+			return this.stat == "done"
 		}
 
 	}
 	
-	cafe.ParallelJob = function(jobs) {
+	Transaction = function(jobs, desc) {
+		
 		if(jobs && jobs instanceof Array)
-			this.jobs = jobs;
+			this.jobs = jobs
 		else
-			this.jobs = [];
-		this.id = cafe.makeUUID();
-		this.stat = "sleep";
-		this.threads = 0;
+			this.jobs = []
+
+		this.id = cafe.makeUUID()
+		this.desc = desc
+		this.stat = "sleep"
+		this.threads = 0
+		/*
 		var id = this.id;
 		this.callback = function() {
 			UIContext.finishJob(id);
 		}
-	};
+		//*/
+	}
 	
-	cafe.ParallelJob.prototype = {
+	Transaction.prototype = {
 		process	: function() {
-			this.stat = "active";
+			this.stat = "active"
 			
-			if(this.init) this.init();
-			this.threads = this.jobs.length;
-			var id = this.id, jobs = this.jobs;
+			//if(this.init) this.init();
+			this.threads = this.jobs.length
+			var id = this.id
+				, jobs = this.jobs
+
 			for(var i = 0; i < jobs.length; ++i) {
+				/*
 				var tid = jobs[i].id;
 				jobs[i].callback = function() {
 					UIContext.finishJob(id, tid);
 				};
-				jobs[i].process();
+				//*/
+				jobs[i].tid = id
+				jobs[i].process()
 			}
 		},
 		
 		done	: function() {
-			//this.stat = "done";
-			return (--this.threads) == 0;
+			this.stat = (--this.threads) == 0 ? "done" : "active";
+			//return (--this.threads) == 0;
 		},
 		
 		isDone	: function() {
 			return this.stat == "done";
 		}
-	};
-	
+	}
 	
 	/*
 	 *	Core Loader Version 1.1
 	 */
-	cafe.Loader = function () {
+	var Loader = function () {
 	
 		//console.log("Start core loader initializing......");
 		
@@ -567,7 +606,7 @@
 		
 	};
 	
-	cafe.Loader.prototype = {
+	Loader.prototype = {
 		
 		hasFile	: function (tag, url) {
 		
@@ -650,7 +689,19 @@
 	};
 	
 	
+	extend(cafe, {
 
+		extend			: extend
+
+		, JobQueue		: JobQueue
+		, Transaction	: Transaction
+		, SerialJob		: SerialJob
+		, AsyncJob		: AsyncJob
+
+		, Loader		: Loader
+
+	})
+	
 	
 	if ( typeof window === "object" && typeof window.document === "object" ) {
 		window.Caffeinated = window.cafe = cafe
