@@ -2,7 +2,7 @@
 
 	$.fn.api = function() { return this.data("api") }
 	
-	icui.ViewManager = function(render) {
+	cafe.ViewManager = function(render) {
 	
 		this.render = render;
 		this.views = {};
@@ -10,13 +10,13 @@
 		
 	};
 	
-	icui.ViewManager.prototype = {
+	cafe.ViewManager.prototype = {
 		
 		load		: function(url, target, params, callback) {
 			
 			var _this = this
 			
-			UIContext.jobs.add(new icui.AsyncJob(function() {
+			UIContext.jobs.add(new cafe.AsyncJob(function() {
 				
 				_this.rendjobids.push(this.id);
 				var targetName = target instanceof $ ? target.selector : target;
@@ -90,9 +90,9 @@
 				html.unwrap();
 			}
 
-			icui.session = icui.session || {permissions: []}
+			cafe.session = cafe.session || {permissions: []}
 			if(hasCookieItem("pms"))
-				icui.session.permissions = eval("['" + getCookieItem("pms").replace(/\,/g , "','") + "']")
+				cafe.session.permissions = eval("['" + getCookieItem("pms").replace(/\,/g , "','") + "']")
 
 			for(var i = 0; i < viewContext._stack.length; ++i) {
 				//console.log(i + "\t - " + viewContext["_stack"][i].id)
@@ -104,7 +104,7 @@
 					, isBeforeLogin = options.beforeLogin
 				
 				if(required)
-					if($.inArray(required, icui.session.permissions) < 0) {
+					if($.inArray(required, cafe.session.permissions) < 0) {
 						$("#" + id).remove()
 						continue
 					}
@@ -139,7 +139,7 @@
 		
 	};
 	
-	icui.URL = function(url, method, data) {
+	cafe.URL = function(url, method, data) {
 		this.url = url;
 		this.method = method;
 		this.data = data;
@@ -152,13 +152,13 @@
 		
 	};
 	
-	icui.Render = function() {
+	cafe.Render = function() {
 		//this.context = context;
 		this.viewIdSequence = {};
 		this.ids = {};
 	};
 	
-	icui.Render.prototype = {
+	cafe.Render.prototype = {
 	
 		rend		: function(xml, context) {
 			
