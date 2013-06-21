@@ -533,16 +533,23 @@
 		process	: function(context) {
 
 			this.stat = "active"
-			
-			this.job(context)
+			this.success = true
+
+			try {
+				this.job(context)
+			} catch(e) {
+				this.success = false
+			}
+
 			this.stat = "done"
 
-			this.queue.finish(this.id)
+			this.done(this.success)
 			
 		}
 		
-		, done	: function() {
-			return this.stat == "done"
+		, done	: function(success) {
+			this.stat == "done"
+			this.queue.finish(this.id, success)
 		}
 		
 		, isDone	: function() {
@@ -575,10 +582,10 @@
 
 		}
 
-		, done		: function() {
+		, done		: function(success) {
 
 			this.stat = "done"
-			this.queue.finish(this.id)
+			this.queue.finish(this.id, success)
 
 		}
 
@@ -619,7 +626,7 @@
 			
 			this.jobs = this.jobs.concat(jobs)
 
-			this.threads += this.jobs.length
+			this.threads = this.jobs.length
 
 			if(this.stat === "active") {
 				this.processJobs(jobs)
@@ -662,7 +669,7 @@
 
 		}
 		
-		, finish: function(id) {
+		, finish: function(id, success) {
 
 			var jobs = this.jobs
 				, job, n
@@ -671,15 +678,23 @@
 
 			if(job.isDone()) {
 				
-				logger.info(
-					  "%c\u2714 %cComplete\t: %c"
-						+ (job.desc || job.id)
-					, "font-weight:bold;color:#00A600"
-					, "font-weight:bold;color:#333"
-					, "font-weight:normal;color:#333")
+				if(success)
+					logger.info(
+						  "%c\u2714 %cComplete\t: %c"
+							+ (job.desc || job.id)
+						, "font-weight:bold;color:#00A600"
+						, "font-weight:bold;color:#333"
+						, "font-weight:normal;color:#333")
+				else
+					logger.info(
+						  "%c\u2716 %cFaild\t\t: %c"
+							+ (job.desc || job.id)
+						, "font-weight:bold;color:red"
+						, "font-weight:bold;color:red"
+						, "font-weight:normal;color:red")
 
-				delete this.jobs[n]
-				this.jobs.shift()
+				delete job
+				//this.jobs.shift()
 
 			}
 
@@ -691,8 +706,8 @@
 			}
 		}
 
-		, done	: function() {
-			this.queue.finish(this.id)
+		, done	: function(success) {
+			this.queue.finish(this.id, success)
 		}
 		
 		, isDone: function() {
@@ -745,31 +760,31 @@
 
 		, loadFile:function(element, context, parent) {
 			var p = parent && parent != undefined ? parent : "head"
+
 			try {
 				document.getElementsByTagName(p)[0].appendChild(element)
 			} catch(e) {
 				console.log(e)
 			}
+
 			if (context && context.done) {
 				//MS IE
 				if (this.browser.ie) {
 					element.onreadystatechange = function () {
 						if (this.readyState == 'loaded' || this.readyState == 'complete') {
-							context.done()
+							context.done(true)
 						}
 					}
-				//Webkit Opera
-				} else if (this.browser.webkit || this.browser.opera) {
+				//Webkit Opera Moz
+				} else if (this.browser.webkit || this.browser.opera || this.browser.moz) {
 					element.onload = function () {
-						context.done()
+						context.done(true)
 					}
-				//Mozilla
-				} else if (this.browser.moz) {
-					element.onload = function () {
-						context.done()
+					element.onerror = function() {
+						context.done(false)
 					}
 				} else {
-					context.done()
+					context.done(true)
 				}
 			}
 		}
